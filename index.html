@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>몬컬 도감 체크</title>
+  <meta name="description" content="메이플스토리 몬스터 컬렉션 — 남은 엘리트·보스 체크">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%95%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <div class="title-row">
+        <h1>몬컬 도감 체크</h1>
+        <div class="progress-nums"><b id="doneCount">0</b> / <span id="totalCount">0</span> · <span id="pct">0%</span></div>
+      </div>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="bar-fill" id="barFill"></div></div>
+      <div class="status-row">
+        <span id="saveStatus" class="save-status"></span>
+        <div id="authArea" class="auth"></div>
+      </div>
+    </div>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <main class="wrap">
+    <div class="controls">
+      <div class="chips" role="tablist">
+        <button class="chip on" data-cat="all">전체</button>
+        <button class="chip" data-cat="elite">엘리트</button>
+        <button class="chip" data-cat="boss">보스·4~5성</button>
+        <button class="chip" data-cat="custom">직접 추가</button>
+      </div>
+      <div class="controls-row">
+        <input id="search" type="search" placeholder="이름 · 맵 · 지역 검색" autocomplete="off">
+        <label class="undone"><input type="checkbox" id="undoneOnly"> 미완료만</label>
+      </div>
+      <div class="controls-row tools">
+        <button id="btnImport" class="ghost">가져오기</button>
+        <button id="btnExport" class="ghost">내보내기</button>
+        <input id="fileImport" type="file" accept=".json,application/json" hidden>
+      </div>
+    </div>
+
+    <section id="sec-elite" class="sec" data-sec="elite">
+      <h2>엘리트 몬스터 <span class="cnt" id="cnt-elite"></span></h2>
+      <div class="grid" id="grid-elite"></div>
+    </section>
+
+    <section id="sec-boss" class="sec" data-sec="boss">
+      <h2>보스 · 4~5성 <span class="cnt" id="cnt-boss"></span></h2>
+      <div id="grid-boss"></div>
+    </section>
+
+    <section id="sec-custom" class="sec" data-sec="custom">
+      <h2>직접 추가 <span class="cnt" id="cnt-custom"></span></h2>
+      <form id="customForm" class="custom-form">
+        <input id="cName" placeholder="이름" required maxlength="60">
+        <select id="cCat">
+          <option>엘리트</option><option>보스</option><option>1성</option><option>기타</option>
+        </select>
+        <input id="cNote" placeholder="메모 (선택)" maxlength="80">
+        <button type="submit">추가</button>
+      </form>
+      <div class="grid" id="grid-custom"></div>
+    </section>
+
+    <p id="empty" class="empty" hidden>조건에 맞는 카드가 없어요.</p>
+    <footer class="foot" id="foot"></footer>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
