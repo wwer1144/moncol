@@ -394,13 +394,36 @@
       const email = $("#email").value.trim();
       if (!email) return;
       const btn = e.target.querySelector("button");
+      if (btn.disabled) return;
       btn.disabled = true;
+      btn.textContent = "보내는 중…";
       const redirect = location.origin + location.pathname;
       const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: redirect } });
-      btn.disabled = false;
-      if (error) { setStatus("로그인 메일 전송 실패: " + error.message, "err"); return; }
+      if (error) {
+        const wait = Number((error.message.match(/after (\d+) seconds?/) || [])[1]);
+        if (wait) {
+          setStatus(`방금 보낸 메일이 있어요. 메일함(스팸함 포함)을 먼저 확인해 주세요.`, "warn");
+          cooldown(btn, wait);
+        } else {
+          setStatus("로그인 메일 전송 실패: " + error.message, "err");
+          btn.disabled = false;
+          btn.textContent = "로그인 링크 받기";
+        }
+        return;
+      }
       setStatus("메일함에서 로그인 링크를 눌러주세요 ✉️", "ok");
+      cooldown(btn, 60);
     });
+    function cooldown(btn, sec) {
+      btn.disabled = true;
+      const tick = () => {
+        if (!btn.isConnected) return;
+        if (sec <= 0) { btn.disabled = false; btn.textContent = "다시 보내기"; return; }
+        btn.textContent = `다시 보내기 (${sec--}초)`;
+        setTimeout(tick, 1000);
+      };
+      tick();
+    }
     $("#authArea").addEventListener("click", async (e) => {
       if (e.target.id !== "btnLogout") return;
       if (saveTimer) await flushSave();
