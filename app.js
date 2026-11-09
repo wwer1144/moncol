@@ -404,6 +404,10 @@
         if (wait) {
           setStatus(`방금 보낸 메일이 있어요. 메일함(스팸함 포함)을 먼저 확인해 주세요.`, "warn");
           cooldown(btn, wait);
+        } else if (/rate limit/i.test(error.message)) {
+          setStatus("메일 발송 한도 초과 — 약 1시간 뒤 다시 시도해 주세요 (무료 플랜은 시간당 2통)", "err");
+          btn.disabled = false;
+          btn.textContent = "로그인 링크 받기";
         } else {
           setStatus("로그인 메일 전송 실패: " + error.message, "err");
           btn.disabled = false;
