@@ -443,12 +443,23 @@
       setStatus("몬스터 목록(data/monsters.json)을 불러오지 못했어요", "err");
     }
 
+    // 매직링크 실패(#error=...)로 돌아온 경우 안내 후 주소 정리
+    let authError = "";
+    if (location.hash.includes("error=")) {
+      const h = new URLSearchParams(location.hash.slice(1));
+      authError = h.get("error_code") === "otp_expired"
+        ? "로그인 링크가 만료됐어요. 다시 요청한 뒤 가장 최근 메일의 링크를 한 번만 눌러주세요."
+        : "로그인 실패: " + (h.get("error_description") || h.get("error"));
+      history.replaceState(null, "", location.pathname + location.search);
+    }
+
     const configured = CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY;
     if (configured && window.supabase?.createClient) {
       sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
       mode = "init";
       const { data } = await sb.auth.getSession();
       await applySession(data.session);
+      if (authError) setStatus(authError, "err");
       sb.auth.onAuthStateChange((_ev, session) => {
         // 콜백 안에서 바로 supabase를 호출하면 교착될 수 있어 한 틱 미룸
         setTimeout(() => applySession(session), 0);
